@@ -3,7 +3,6 @@ import { Router, NavigationStart, NavigationEnd } from '@angular/router';
 import { map } from 'rxjs/operators/map';
 import { take } from 'rxjs/operators/take';
 import { filter } from 'rxjs/operators/filter';
-import { Plunker } from 'create-plunker';
 import { sources as demoUtilsSources } from './demo-modules/demo-utils/sources';
 
 interface Source {
@@ -122,68 +121,5 @@ export class DemoAppComponent implements OnInit {
         );
         this.activeDemo.sources = await getSources(this.activeDemo.path);
       });
-  }
-
-  editInPlunker(demo: Demo): void {
-    Plunker.create()
-      .addIndexHeadLine(`<title>${demo.label}</title>`)
-      .addNpmPackage('bootstrap', {
-        version: dependencyVersions.bootstrap,
-        filename: 'dist/css/bootstrap.min.css'
-      })
-      .addNpmPackage('font-awesome', {
-        version: dependencyVersions.fontAwesome,
-        filename: 'css/font-awesome.css'
-      })
-      .addNpmPackage('angular-calendar', {
-        version: dependencyVersions.angularCalendar,
-        filename: 'css/angular-calendar.css'
-      })
-      .addNpmPackage('zone.js', { version: dependencyVersions.zoneJs })
-      .addNpmPackage('zone.js', {
-        version: dependencyVersions.zoneJs,
-        filename: 'dist/long-stack-trace-zone.js'
-      })
-      .addNpmPackage('reflect-metadata', {
-        version: dependencyVersions.reflectMetadata
-      })
-      .addNpmPackage('systemjs', {
-        version: '0.19',
-        filename: 'dist/system.js'
-      })
-      .addFile({
-        name: 'config.js',
-        contents: require('./plunker-assets/plunker-system-config.ejs')({
-          dependencyVersions
-        })
-      })
-      .addInlineScript(
-        `System.import('app').catch(console.error.bind(console));`
-      )
-      .setIndexBody('<mwl-demo-component>Loading...</mwl-demo-component>')
-      .addFiles(
-        demoUtilsSources.map(source => ({
-          name: `demo-utils/${source.filename}`,
-          contents: source.contents.raw
-        }))
-      )
-      .addFiles(
-        demo.sources.map(source => {
-          return {
-            name: `demo/${source.filename}`,
-            // hacky fix to get relative style and template urls to work with system.js
-            contents: source.contents.raw.replace(
-              /@Component\({/g,
-              '@Component({\n  moduleId: __moduleName,'
-            )
-          };
-        }),
-        true
-      )
-      .addFile({
-        name: 'bootstrap.ts',
-        contents: require('./plunker-assets/plunker-bootstrap.ejs')()
-      })
-      .save();
   }
 }

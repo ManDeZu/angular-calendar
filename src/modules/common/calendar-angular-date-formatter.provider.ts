@@ -45,7 +45,7 @@ export class CalendarAngularDateFormatter
     date,
     locale
   }: DateFormatterParams): string {
-    return new DatePipe(locale).transform(date, 'MMM d', locale);
+    return new DatePipe(locale).transform(date, 'd MMM', locale);
   }
 
   /**
@@ -54,20 +54,20 @@ export class CalendarAngularDateFormatter
   public weekViewTitle({ date, locale }: DateFormatterParams): string {
     const year: string = new DatePipe(locale).transform(date, 'y', locale);
     const weekNumber: number = getISOWeek(date);
-    return `Week ${weekNumber} of ${year}`;
+    return `Semaine ${weekNumber} en ${year}`;
   }
 
   /**
    * The time formatting down the left hand side of the day view
    */
   public dayViewHour({ date, locale }: DateFormatterParams): string {
-    return new DatePipe(locale).transform(date, 'h a', locale);
+    return new DatePipe(locale).transform(date, 'HH:mm ', locale);
   }
 
   /**
    * The day view title
    */
   public dayViewTitle({ date, locale }: DateFormatterParams): string {
-    return new DatePipe(locale).transform(date, 'EEEE, MMMM d, y', locale);
+    return new DatePipe(locale).transform(date, 'EEEE d MMMM y', locale);
   }
 }

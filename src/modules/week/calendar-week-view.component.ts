@@ -18,6 +18,9 @@ import {
   CalendarEvent,
   WeekViewEvent,
   WeekView,
+  DayViewHour,
+  DayViewHourSegment,
+  DayViewEvent,
   ViewPeriod
 } from 'calendar-utils';
 import { ResizeEvent } from 'angular-resizable-element';
@@ -38,6 +41,11 @@ export interface CalendarWeekViewBeforeRenderEvent {
   header: WeekDay[];
   period: ViewPeriod;
 }
+
+/**
+ * @hidden
+ */
+const MINUTES_IN_HOUR: number = 60;
 
 /**
  * Shows all events on a given week. Example usage:
@@ -95,7 +103,6 @@ export interface CalendarWeekViewBeforeRenderEvent {
           </mwl-calendar-week-view-event>
         </div>
       </div>
-    </div>
   `
 })
 export class CalendarWeekViewComponent implements OnChanges, OnInit, OnDestroy {
@@ -143,8 +150,7 @@ export class CalendarWeekViewComponent implements OnChanges, OnInit, OnDestroy {
   /**
    * The start number of the week
    */
-  @Input() weekStartsOn: number;
-
+  @Input() weekStartsOn: number = 1;
   /**
    * A custom template to use to replace the header
    */
@@ -170,6 +176,36 @@ export class CalendarWeekViewComponent implements OnChanges, OnInit, OnDestroy {
    * An array of day indexes (0 = sunday, 1 = monday etc) that indicate which days are weekends
    */
   @Input() weekendDays: number[];
+
+  /**
+   * The number of segments in an hour. Must be <= 6
+   */
+  @Input() hourSegments: number = 2;
+
+  /**
+   * The height in pixels of each hour segment
+   */
+  @Input() hourSegmentHeight: number = 30;
+
+  /**
+   * The day start hours in 24 hour time. Must be 0-23
+   */
+  @Input() dayStartHour: number = 0;
+
+  /**
+   * The day start minutes. Must be 0-59
+   */
+  @Input() dayStartMinute: number = 0;
+
+  /**
+   * The day end hours in 24 hour time. Must be 0-23
+   */
+  @Input() dayEndHour: number = 23;
+
+  /**
+   * The day end minutes. Must be 0-59
+   */
+  @Input() dayEndMinute: number = 59;
 
   /**
    * Called when a header week day is clicked. Adding a `cssClass` property on `$event.day` will add that class to the header element
@@ -251,12 +287,24 @@ export class CalendarWeekViewComponent implements OnChanges, OnInit, OnDestroy {
   /**
    * @hidden
    */
+  trackByHour = (index: number, hour: DayViewHour) =>
+  hour.segments[0].date.toISOString();
+
+/**
+ * @hidden
+ */
+trackByHourSegment = (index: number, segment: DayViewHourSegment) =>
+  segment.date.toISOString();
+
+  /**
+   * @hidden
+   */
   constructor(
     private cdr: ChangeDetectorRef,
     private utils: CalendarUtils,
     @Inject(LOCALE_ID) locale: string
   ) {
-    this.locale = locale;
+    this.locale = 'fr';
   }
 
   /**
