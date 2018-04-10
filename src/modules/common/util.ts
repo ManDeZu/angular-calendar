@@ -1,7 +1,8 @@
 import {
   CalendarEvent,
   validateEvents as validateEventsWithoutLog,
-  WeekDay
+  WeekDay,
+  MonthDay
 } from 'calendar-utils';
 
 export const validateEvents = (events: CalendarEvent[]) => {
@@ -28,4 +29,10 @@ export const trackByEventId = (index: number, event: CalendarEvent) =>
 export const trackByWeekDayHeaderDate = (index: number, day: WeekDay) =>
   day.date.toISOString();
 
+export const trackByMonthDayHeaderDate = (index: number, day: MonthDay) =>
+  day.date.toISOString();
+
 export const trackByIndex = (index: number) => index;
+
+export const trackByBsId = (index: number, event: CalendarEvent) => 
+  event.meta.bs ? event.meta.bs : event;

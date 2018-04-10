@@ -1,27 +1,42 @@
 import { Injectable } from '@angular/core';
 import {
+  MonthView,
   getMonthView,
   GetMonthViewArgs,
-  MonthView,
+  getMonthViewHeader,
+  GetMonthViewHeaderArgs,
+  MonthDay,
+  MonthViewJoursPlanningByUser,
+  getMonthViewBody,
+  GetMonthViewBodyArgs,
+  WeekView,
+  getWeekView,
+  GetWeekViewArgs,
   getWeekViewHeader,
   GetWeekViewHeaderArgs,
   WeekDay,
-  getWeekView,
-  GetWeekViewArgs,
   getDayView,
   GetDayViewArgs,
-  DayView,
   getDayViewHourGrid,
   GetDayViewHourGridArgs,
+  DayView,
   DayViewHour,
-  WeekView
 } from 'calendar-utils';
 
 @Injectable()
 export class CalendarUtils {
+
   getMonthView(args: GetMonthViewArgs): MonthView {
     return getMonthView(args);
   }
+
+  getMonthViewHeader(args: GetMonthViewHeaderArgs): MonthDay[] {
+    return getMonthViewHeader(args);
+  } 
+
+  getMonthViewBody(args: GetMonthViewBodyArgs): MonthViewJoursPlanningByUser[] {
+    return getMonthViewBody(args);
+  } 
 
   getWeekViewHeader(args: GetWeekViewHeaderArgs): WeekDay[] {
     return getWeekViewHeader(args);

@@ -1,6 +1,6 @@
 import { Component, Input, TemplateRef } from '@angular/core';
-import { WeekDay } from 'calendar-utils';
-import { trackByWeekDayHeaderDate } from '../common/util';
+import { WeekDay, MonthDay } from 'calendar-utils';
+import { trackByMonthDayHeaderDate } from '../common/util';
 
 @Component({
   selector: 'mwl-calendar-month-view-header',
@@ -12,13 +12,13 @@ import { trackByWeekDayHeaderDate } from '../common/util';
       <div class="cal-cell-row cal-header">
         <div
           class="cal-cell"
-          *ngFor="let day of days; trackBy:trackByWeekDayHeaderDate"
+          *ngFor="let day of days; trackBy:trackByMonthDayHeaderDate"
           [class.cal-past]="day.isPast"
           [class.cal-today]="day.isToday"
           [class.cal-future]="day.isFuture"
           [class.cal-weekend]="day.isWeekend"
           [ngClass]="day.cssClass">
-          {{ day.date | calendarDate:'monthViewColumnHeader':locale }}
+          {{ day.dayNumber | number }}
         </div>
       </div>
     </ng-template>
@@ -29,11 +29,11 @@ import { trackByWeekDayHeaderDate } from '../common/util';
   `
 })
 export class CalendarMonthViewHeaderComponent {
-  @Input() days: WeekDay[];
+  @Input() days: MonthDay[];
 
   @Input() locale: string;
 
   @Input() customTemplate: TemplateRef<any>;
 
-  trackByWeekDayHeaderDate = trackByWeekDayHeaderDate;
+  trackByMonthDayHeaderDate = trackByMonthDayHeaderDate;
 }

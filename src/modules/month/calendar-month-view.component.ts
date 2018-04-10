@@ -13,10 +13,12 @@ import {
 } from '@angular/core';
 import {
   CalendarEvent,
-  WeekDay,
+  MonthDay,
   MonthView,
   MonthViewDay,
-  ViewPeriod
+  ViewPeriod,
+  MonthViewJoursPlanningByUser,
+  MonthViewJourPlanningRows
 } from 'calendar-utils';
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
@@ -32,10 +34,12 @@ import addSeconds from 'date-fns/add_seconds/index';
 import { CalendarEventTimesChangedEvent } from '../common/calendar-event-times-changed-event.interface';
 import { CalendarUtils } from '../common/calendar-utils.provider';
 import { validateEvents, trackByIndex } from '../common/util';
+import { getDaysInMonth, eachDay, startOfMonth, lastDayOfMonth, isBefore, isFuture, isPast, isToday } from 'date-fns';
+import { forEach } from '@angular/router/src/utils/collection';
 
-export interface CalendarMonthViewBeforeRenderEvent {
-  header: WeekDay[];
-  body: MonthViewDay[];
+export interface CalendarMonthViewBeforeRenderPlanning {
+  header: MonthDay[];
+  body: MonthViewJoursPlanningByUser[];
   period: ViewPeriod;
 }
 
@@ -44,56 +48,29 @@ export interface CalendarMonthViewEventTimesChangedEvent
   day: MonthViewDay;
 }
 
-/**
- * Shows all events on a given month. Example usage:
- *
- * ```typescript
- * <mwl-calendar-month-view
- *  [viewDate]="viewDate"
- *  [events]="events">
- * </mwl-calendar-month-view>
- * ```
- */
+
 @Component({
   selector: 'mwl-calendar-month-view',
   template: `
     <div class="cal-month-view">
-      <mwl-calendar-month-view-header
-        [days]="columnHeaders"
-        [locale]="locale"
-        [customTemplate]="headerTemplate">
-      </mwl-calendar-month-view-header>
-      <div class="cal-days">
-        <div *ngFor="let rowIndex of view.rowOffsets; trackByIndex">
-          <div class="cal-cell-row">
-            <mwl-calendar-month-cell
-              *ngFor="let day of (view.days | slice : rowIndex : rowIndex + (view.totalDaysVisibleInWeek)); trackBy:trackByDate"
-              [class.cal-drag-over]="day.dragOver"
-              [ngClass]="day?.cssClass"
-              [day]="day"
-              [openDay]="openDay"
-              [locale]="locale"
-              [tooltipPlacement]="tooltipPlacement"
-              [tooltipAppendToBody]="tooltipAppendToBody"
-              [tooltipTemplate]="tooltipTemplate"
-              [customTemplate]="cellTemplate"
-              (click)="handleDayClick($event, day)"
-              (highlightDay)="toggleDayHighlight($event.event, true)"
-              (unhighlightDay)="toggleDayHighlight($event.event, false)"
-              mwlDroppable
-              (dragEnter)="day.dragOver = true"
-              (dragLeave)="day.dragOver = false"
-              (drop)="day.dragOver = false; eventDropped(day, $event.dropData.event)"
-              (eventClicked)="eventClicked.emit({event: $event.event})">
-            </mwl-calendar-month-cell>
-          </div>
-          <mwl-calendar-open-day-events
-            [isOpen]="openRowIndex === rowIndex"
-            [events]="openDay?.events"
-            [customTemplate]="openDayEventsTemplate"
-            [eventTitleTemplate]="eventTitleTemplate"
-            (eventClicked)="eventClicked.emit({event: $event.event})">
-          </mwl-calendar-open-day-events>
+      <div class = "row">
+        <div class = "col-md-2">
+        </div>
+        <div class = "col-md-10">
+          <mwl-calendar-month-view-header
+            [days]="columnHeaders"
+            [locale]="locale"
+            [customTemplate]="headerTemplate">
+          </mwl-calendar-month-view-header>
+        </div>
+      </div>
+      <div class = "row">
+        <div class = "col-md-2">
+          <mwl-calendar-month-view-body
+            [joursPlanningByUsers]="joursPlanningByUsers"
+            [locale]="locale"
+            [customTemplate]="bodyTemplate">
+          </mwl-calendar-month-view-body>
         </div>
       </div>
     </div>
@@ -110,7 +87,7 @@ export class CalendarMonthViewComponent
    * An array of events to display on view.
    * The schema is available here: https://github.com/mattlewis92/calendar-utils/blob/c51689985f59a271940e30bc4e2c4e1fee3fcb5c/src/calendarUtils.ts#L49-L63
    */
-  @Input() events: CalendarEvent[] = [];
+  // @Input() events: CalendarEvent[] = [];
 
   /**
    * An array of day indexes (0 = sunday, 1 = monday etc) that will be hidden on the view
@@ -120,7 +97,7 @@ export class CalendarMonthViewComponent
   /**
    * Whether the events list for the day of the `viewDate` option is visible or not
    */
-  @Input() activeDayIsOpen: boolean = false;
+  // @Input() activeDayIsOpen: boolean = false;
 
   /**
    * An observable that when emitted on will re-render the current view
@@ -130,7 +107,7 @@ export class CalendarMonthViewComponent
   /**
    * The locale used to format dates
    */
-  @Input() locale: string;
+  @Input() locale: string = 'fr';
 
   /**
    * The placement of the event tooltip
@@ -148,11 +125,6 @@ export class CalendarMonthViewComponent
   @Input() tooltipAppendToBody: boolean = true;
 
   /**
-   * The start number of the week
-   */
-  @Input() weekStartsOn: number;
-
-  /**
    * A custom template to use to replace the header
    */
   @Input() headerTemplate: TemplateRef<any>;
@@ -160,29 +132,32 @@ export class CalendarMonthViewComponent
   /**
    * A custom template to use to replace the day cell
    */
-  @Input() cellTemplate: TemplateRef<any>;
+  // @Input() cellTemplate: TemplateRef<any>;
 
   /**
    * A custom template to use for the slide down box of events for the active day
    */
-  @Input() openDayEventsTemplate: TemplateRef<any>;
+  // @Input() openDayEventsTemplate: TemplateRef<any>;
 
   /**
    * A custom template to use for event titles
    */
-  @Input() eventTitleTemplate: TemplateRef<any>;
+  // @Input() eventTitleTemplate: TemplateRef<any>;
 
   /**
    * An array of day indexes (0 = sunday, 1 = monday etc) that indicate which days are weekends
    */
-  @Input() weekendDays: number[];
+  // @Input() weekendDays: number[];
+
+
+  @Input() joursPlanningByUsers: MonthViewJoursPlanningByUser[];
 
   /**
    * An output that will be called before the view is rendered for the current month.
    * If you add the `cssClass` property to a day in the body it will add that class to the cell element in the template
    */
   @Output()
-  beforeViewRender = new EventEmitter<CalendarMonthViewBeforeRenderEvent>();
+  beforeViewRender = new EventEmitter<CalendarMonthViewBeforeRenderPlanning>();
 
   /**
    * Called when the day cell is clicked
@@ -195,28 +170,35 @@ export class CalendarMonthViewComponent
   /**
    * Called when the event title is clicked
    */
-  @Output()
-  eventClicked = new EventEmitter<{
-    event: CalendarEvent;
-  }>();
+  // @Output()
+  // eventClicked = new EventEmitter<{
+  //   event: CalendarEvent;
+  // }>();
 
   /**
    * Called when an event is dragged and dropped
    */
-  @Output()
-  eventTimesChanged = new EventEmitter<
-    CalendarMonthViewEventTimesChangedEvent
-  >();
+  // @Output()
+  // eventTimesChanged = new EventEmitter<
+  //   CalendarMonthViewEventTimesChangedEvent
+  // >();
 
   /**
    * @hidden
    */
-  columnHeaders: WeekDay[];
+  columnHeaders: MonthDay[] = [];
+
+  monthDays: any;
 
   /**
    * @hidden
    */
   view: MonthView;
+
+  /**
+   * @hidden
+   */
+  days: MonthViewDay[] = [];
 
   /**
    * @hidden
@@ -243,6 +225,8 @@ export class CalendarMonthViewComponent
    */
   trackByDate = (index: number, day: MonthViewDay) => day.date.toISOString();
 
+  trackByJoursPlanningByUser = (index: number, joursPlanningByUser: MonthViewJoursPlanningByUser) => joursPlanningByUser ? joursPlanningByUser.id : joursPlanningByUser;
+
   /**
    * @hidden
    */
@@ -254,6 +238,7 @@ export class CalendarMonthViewComponent
     this.locale = locale;
   }
 
+
   /**
    * @hidden
    */
@@ -263,6 +248,8 @@ export class CalendarMonthViewComponent
         this.refreshAll();
         this.cdr.markForCheck();
       });
+    } else {
+      this.columnHeaders = this.getMonthDays();      
     }
   }
 
@@ -274,9 +261,9 @@ export class CalendarMonthViewComponent
       this.refreshHeader();
     }
 
-    if (changes.events) {
-      validateEvents(this.events);
-    }
+    // if (changes.events) {
+    //   validateEvents(this.events);
+    // }
 
     if (
       changes.viewDate ||
@@ -287,14 +274,14 @@ export class CalendarMonthViewComponent
       this.refreshBody();
     }
 
-    if (
-      changes.activeDayIsOpen ||
-      changes.viewDate ||
-      changes.events ||
-      changes.excludeDays
-    ) {
-      this.checkActiveDayIsOpen();
-    }
+    // if (
+    //   changes.activeDayIsOpen ||
+    //   changes.viewDate ||
+    //   changes.events ||
+    //   changes.excludeDays
+    // ) {
+    //   this.checkActiveDayIsOpen();
+    // }
   }
 
   /**
@@ -309,97 +296,107 @@ export class CalendarMonthViewComponent
   /**
    * @hidden
    */
-  toggleDayHighlight(event: CalendarEvent, isHighlighted: boolean): void {
-    this.view.days.forEach(day => {
-      if (isHighlighted && day.events.indexOf(event) > -1) {
-        day.backgroundColor =
-          (event.color && event.color.secondary) || '#D1E8FF';
-      } else {
-        delete day.backgroundColor;
-      }
-    });
-  }
+  // toggleDayHighlight(event: CalendarEvent, isHighlighted: boolean): void {
+  //   this.view.days.forEach(day => {
+  //     if (isHighlighted && day.events.indexOf(event) > -1) {
+  //       day.backgroundColor = event.color.secondary;
+  //     } else {
+  //       delete day.backgroundColor;
+  //     }
+  //   });
+  // }
+
+  // /**
+  //  * @hidden
+  //  */
+  // eventDropped(day: MonthViewDay, event: CalendarEvent): void {
+  //   const year: number = getYear(day.date);
+  //   const month: number = getMonth(day.date);
+  //   const date: number = getDate(day.date);
+  //   const newStart: Date = setDate(
+  //     setMonth(setYear(event.start, year), month),
+  //     date
+  //   );
+  //   let newEnd: Date;
+  //   if (event.end) {
+  //     const secondsDiff: number = differenceInSeconds(newStart, event.start);
+  //     newEnd = addSeconds(event.end, secondsDiff);
+  //   }
+  //   this.eventTimesChanged.emit({ event, newStart, newEnd, day });
+  // }
 
   /**
    * @hidden
    */
-  eventDropped(day: MonthViewDay, event: CalendarEvent): void {
-    const year: number = getYear(day.date);
-    const month: number = getMonth(day.date);
-    const date: number = getDate(day.date);
-    const newStart: Date = setDate(
-      setMonth(setYear(event.start, year), month),
-      date
-    );
-    let newEnd: Date;
-    if (event.end) {
-      const secondsDiff: number = differenceInSeconds(newStart, event.start);
-      newEnd = addSeconds(event.end, secondsDiff);
-    }
-    this.eventTimesChanged.emit({ event, newStart, newEnd, day });
-  }
-
-  /**
-   * @hidden
-   */
-  handleDayClick(clickEvent: any, day: MonthViewDay) {
-    // when using hammerjs, stopPropagation doesn't work. See https://github.com/mattlewis92/angular-calendar/issues/318
-    if (!clickEvent.target.classList.contains('cal-event')) {
-      this.dayClicked.emit({ day });
-    }
-  }
+  // handleDayClick(clickEvent: any, day: MonthViewDay) {
+  //   // when using hammerjs, stopPropagation doesn't work. See https://github.com/mattlewis92/angular-calendar/issues/318
+  //   if (!clickEvent.target.classList.contains('cal-event')) {
+  //     this.dayClicked.emit({ day });
+  //   }
+  // }
 
   private refreshHeader(): void {
-    this.columnHeaders = this.utils.getWeekViewHeader({
-      viewDate: this.viewDate,
-      weekStartsOn: this.weekStartsOn,
-      excluded: this.excludeDays,
-      weekendDays: this.weekendDays
-    });
+    this.columnHeaders.length = 0;
+    this.columnHeaders = this.getMonthDays();
     this.emitBeforeViewRender();
   }
 
   private refreshBody(): void {
+    this.view = null;
     this.view = this.utils.getMonthView({
-      events: this.events,
       viewDate: this.viewDate,
-      weekStartsOn: this.weekStartsOn,
-      excluded: this.excludeDays,
-      weekendDays: this.weekendDays
+      joursPlanningByUsers: this.joursPlanningByUsers
     });
     this.emitBeforeViewRender();
   }
 
-  private checkActiveDayIsOpen(): void {
-    if (this.activeDayIsOpen === true) {
-      this.openDay = this.view.days.find(day =>
-        isSameDay(day.date, this.viewDate)
-      );
-      const index: number = this.view.days.indexOf(this.openDay);
-      this.openRowIndex =
-        Math.floor(index / this.view.totalDaysVisibleInWeek) *
-        this.view.totalDaysVisibleInWeek;
-    } else {
-      this.openRowIndex = null;
-      this.openDay = null;
-    }
-  }
+  // private checkActiveDayIsOpen(): void {
+  //   if (this.activeDayIsOpen === true) {
+  //     this.openDay = this.view.days.find(day =>
+  //       isSameDay(day.date, this.viewDate)
+  //     );
+  //     const index: number = this.view.days.indexOf(this.openDay);
+  //     // this.openRowIndex =
+  //     //   Math.floor(index / this.view.totalDaysVisibleInWeek) *
+  //     //   this.view.totalDaysVisibleInWeek;
+  //   } else {
+  //     this.openRowIndex = null;
+  //     this.openDay = null;
+  //   }
+  // }
 
   private refreshAll(): void {
-    this.columnHeaders = null;
+    // this.columnHeaders = null;
     this.view = null;
     this.refreshHeader();
     this.refreshBody();
-    this.checkActiveDayIsOpen();
+    // this.checkActiveDayIsOpen();
   }
 
   private emitBeforeViewRender(): void {
     if (this.columnHeaders && this.view) {
       this.beforeViewRender.emit({
         header: this.columnHeaders,
-        body: this.view.days,
+        body: this.view.joursPlanningByUsers,
         period: this.view.period
       });
     }
+  }
+
+  private getMonthDays(): MonthDay[] {
+    const start: Date = new Date(this.viewDate.getFullYear(), this.viewDate.getMonth(), 1);
+    const end: Date = new Date(this.viewDate.getFullYear(), this.viewDate.getMonth() +1, 0);
+    const monthDays: Date[] = eachDay(start, end);
+    for(const day of monthDays) {
+      const monthDay = {
+        date: day,
+        dayNumber: day.getDate(),
+        isPast: (isPast(day) ? true : false),
+        isToday: (isToday(day) ? true : false),
+        isFuture: (isFuture(day) ? true : false)
+      };
+      this.columnHeaders.push(monthDay);
+    }
+    return this.columnHeaders;
   }
 }

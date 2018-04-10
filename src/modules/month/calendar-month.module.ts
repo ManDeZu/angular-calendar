@@ -6,10 +6,11 @@ import { CalendarMonthViewHeaderComponent } from './calendar-month-view-header.c
 import { CalendarMonthCellComponent } from './calendar-month-cell.component';
 import { CalendarOpenDayEventsComponent } from './calendar-open-day-events.component';
 import { CalendarCommonModule } from '../common/calendar-common.module';
+import { CalendarMonthViewBodyComponent } from './calendar-month-view-body.component';
 
 export {
   CalendarMonthViewComponent,
-  CalendarMonthViewBeforeRenderEvent,
+  CalendarMonthViewBeforeRenderPlanning,
   CalendarMonthViewEventTimesChangedEvent
 } from './calendar-month-view.component';
 export { MonthViewDay as CalendarMonthViewDay } from 'calendar-utils';
@@ -20,14 +21,16 @@ export { MonthViewDay as CalendarMonthViewDay } from 'calendar-utils';
     CalendarMonthViewComponent,
     CalendarMonthCellComponent,
     CalendarOpenDayEventsComponent,
-    CalendarMonthViewHeaderComponent
+    CalendarMonthViewHeaderComponent,
+    CalendarMonthViewBodyComponent
   ],
   exports: [
     DragAndDropModule,
     CalendarMonthViewComponent,
     CalendarMonthCellComponent,
     CalendarOpenDayEventsComponent,
-    CalendarMonthViewHeaderComponent
+    CalendarMonthViewHeaderComponent,
+    CalendarMonthViewBodyComponent
   ]
 })
 export class CalendarMonthModule {}
