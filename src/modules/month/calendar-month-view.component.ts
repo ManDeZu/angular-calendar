@@ -52,24 +52,31 @@ export interface CalendarMonthViewEventTimesChangedEvent
 @Component({
   selector: 'mwl-calendar-month-view',
   template: `
-    <div class="cal-month-view">
-      <div class = "row">
-        <div class = "col-md-2">
-        </div>
-        <div class = "col-md-10">
-          <mwl-calendar-month-view-header
-            [days]="columnHeaders"
-            [locale]="locale"
-            [customTemplate]="headerTemplate">
-          </mwl-calendar-month-view-header>
+    <div class="row">
+      <div class="col-md-2 side-panel-container no-padding">
+        <div class="side-panel">
+          Panneau latéral
         </div>
       </div>
-      <div class = "row">
-        <div class = "col-md-2">
+      <div class="col-md-10 cal-month-view">
+        <div class = "row">
+          <div class = "col-md-1">
+          </div>
+          <div class = "col-md-11">
+            <mwl-calendar-month-view-header
+              [days]="columnHeaders"
+              [locale]="locale"
+              [customTemplate]="headerTemplate">
+            </mwl-calendar-month-view-header>
+          </div>
+        </div>
+        <div class ="col-md-12 no-padding">
           <mwl-calendar-month-view-body
             [joursPlanningByUsers]="joursPlanningByUsers"
             [locale]="locale"
             [customTemplate]="bodyTemplate">
+            <div class = "col-md-1">
+            </div>
           </mwl-calendar-month-view-body>
         </div>
       </div>
@@ -259,6 +266,7 @@ export class CalendarMonthViewComponent
   ngOnChanges(changes: any): void {
     if (changes.viewDate || changes.excludeDays || changes.weekendDays) {
       this.refreshHeader();
+      this.refreshBody();
     }
 
     // if (changes.events) {

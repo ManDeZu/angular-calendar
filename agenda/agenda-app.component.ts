@@ -3,7 +3,7 @@ import { Router, NavigationStart, NavigationEnd } from '@angular/router';
 import { map } from 'rxjs/operators/map';
 import { take } from 'rxjs/operators/take';
 import { filter } from 'rxjs/operators/filter';
-import { sources as demoUtilsSources } from './demo-modules/demo-utils/sources';
+import { sources as agendaUtilsSources } from './agenda-modules/agenda-utils/sources';
 
 interface Source {
   filename: string;
@@ -14,14 +14,14 @@ interface Source {
   language: string;
 }
 
-interface Demo {
+interface Agenda {
   label: string;
   path: string;
   sources?: Source[];
 }
 
 async function getSources(folder: string): Promise<Source[]> {
-  const { sources } = await import('./demo-modules/' + folder + '/sources.ts');
+  const { sources } = await import('./agenda-modules/' + folder + '/sources.ts');
 
   return sources.map(({ filename, contents }) => {
     const [, extension]: RegExpMatchArray = filename.match(/^.+\.(.+)$/);
@@ -35,13 +35,13 @@ async function getSources(folder: string): Promise<Source[]> {
       contents: {
         raw: contents.raw
           .replace(
-            ",\n    RouterModule.forChild([{ path: '', component: DemoComponent }])",
+            ",\n    RouterModule.forChild([{ path: '', component: AgendaComponent }])",
             ''
           )
           .replace("\nimport { RouterModule } from '@angular/router';", ''),
         highlighted: contents.highlighted // TODO - move this into a regexp replace for both
           .replace(
-            ',\n    RouterModule.forChild([{ path: <span class="hljs-string">\'\'</span>, component: DemoComponent }])',
+            ',\n    RouterModule.forChild([{ path: <span class="hljs-string">\'\'</span>, component: AgendaComponent }])',
             ''
           )
           .replace(
@@ -78,22 +78,22 @@ const dependencyVersions: any = {
 };
 
 @Component({
-  selector: 'mwl-demo-app',
-  styleUrls: ['./demo-app.css'],
-  templateUrl: './demo-app.html'
+  selector: 'mwl-agenda-app',
+  styleUrls: ['./agenda-app.css'],
+  templateUrl: './agenda-app.html'
 })
-export class DemoAppComponent implements OnInit {
-  demos: Demo[] = [];
-  activeDemo: Demo;
+export class AgendaAppComponent implements OnInit {
+  agendas: Agenda[] = [];
+  activeAgenda: Agenda;
   isMenuVisible = false;
-  firstDemoLoaded = false;
+  firstAgendaLoaded = false;
 
   constructor(private router: Router) {}
 
   ngOnInit() {
     const defaultRoute = this.router.config.find(route => route.path === '**');
 
-    this.demos = this.router.config
+    this.agendas = this.router.config
       .filter(route => route.path !== '**')
       .map(route => ({
         path: route.path,
@@ -103,7 +103,7 @@ export class DemoAppComponent implements OnInit {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .pipe(take(1))
-      .subscribe(() => (this.firstDemoLoaded = true));
+      .subscribe(() => (this.firstAgendaLoaded = true));
 
     this.router.events
       .pipe(filter(event => event instanceof NavigationStart))
@@ -116,10 +116,10 @@ export class DemoAppComponent implements OnInit {
         })
       )
       .subscribe(async (event: NavigationStart) => {
-        this.activeDemo = this.demos.find(
-          demo => `/${demo.path}` === event.url
+        this.activeAgenda = this.agendas.find(
+          agenda => `/${agenda.path}` === event.url
         );
-        this.activeDemo.sources = await getSources(this.activeDemo.path);
+        this.activeAgenda.sources = await getSources(this.activeAgenda.path);
       });
   }
 }

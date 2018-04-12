@@ -7,12 +7,12 @@ import { RouterModule, PreloadAllModules } from '@angular/router';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgbTabsetModule, NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
-import { DemoAppComponent } from './demo-app.component';
+import { AgendaAppComponent } from './agenda-app.component';
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
 
 @NgModule({
-  declarations: [DemoAppComponent],
+  declarations: [AgendaAppComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -22,7 +22,7 @@ import localeFr from '@angular/common/locales/fr';
       [
         {
           path: 'planning',
-          loadChildren: './demo-modules/planning/module#DemoModule',
+          loadChildren: './agenda-modules/planning/module#AgendaModule',
           data: {
             label: 'PLANNING'
           }
@@ -38,6 +38,6 @@ import localeFr from '@angular/common/locales/fr';
       }
     )
   ],
-  bootstrap: [DemoAppComponent]
+  bootstrap: [AgendaAppComponent]
 })
-export class DemoAppModule {}
+export class AgendaAppModule {}

@@ -18,7 +18,7 @@ import 'zone.js/dist/zone';
 import 'hammerjs';
 import { enableProdMode } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { DemoAppModule } from './demo-app.module';
+import { AgendaAppModule } from './agenda-app.module';
 
 declare const ENV: string;
 if (ENV === 'production') {
@@ -41,5 +41,5 @@ if (typeof Element.prototype['animate'] === 'undefined') {
 }
 
 Promise.all(dynamicPolyfills).then(() =>
-  platformBrowserDynamic().bootstrapModule(DemoAppModule)
+  platformBrowserDynamic().bootstrapModule(AgendaAppModule)
 );

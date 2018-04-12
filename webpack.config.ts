@@ -14,7 +14,7 @@ export default (env = 'development') => {
 
   return {
     devtool: ifProduction('source-map', 'eval'),
-    entry: path.join(__dirname, 'demos', 'entry.ts'),
+    entry: path.join(__dirname, 'agenda', 'entry.ts'),
     output: {
       filename: ifProduction('[name]-[chunkhash].js', '[name].js')
     },
@@ -60,7 +60,7 @@ export default (env = 'development') => {
         test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
         loader: 'file-loader'
       }, {
-        test: /demos[\/\\].+\.(css|html)$/,
+        test: /agenda[\/\\].+\.(css|html)$/,
         loader: 'raw-loader'
       }, {
         test: /\.ejs$/,
@@ -85,13 +85,13 @@ export default (env = 'development') => {
         exclude: /export '\w+' was not found in 'calendar-utils'/
       }),
       ifDevelopment(new ForkTsCheckerWebpackPlugin({
-        watch: ['./src', './demos'],
+        watch: ['./src', './agenda'],
         formatter: 'codeframe'
       })),
       ifDevelopment(new webpack.HotModuleReplacementPlugin()),
       ifProduction(new webpack.optimize.ModuleConcatenationPlugin()),
       ifProduction(new AngularCompilerPlugin({
-        tsConfigPath: './tsconfig-demos.json',
+        tsConfigPath: './tsconfig-agenda.json',
         sourceMap: true
       })),
       new webpack.DefinePlugin({
@@ -106,7 +106,7 @@ export default (env = 'development') => {
       })),
       new webpack.ContextReplacementPlugin(
         /angular(\\|\/)core(\\|\/)esm5/,
-        __dirname + '/demos'
+        __dirname + '/agenda'
       ),
       new webpack.optimize.CommonsChunkPlugin({
         name: 'main',
@@ -114,7 +114,7 @@ export default (env = 'development') => {
         minChunks: 2
       }),
       new HtmlWebpackPlugin({
-        template: path.join(__dirname, 'demos', 'index.ejs')
+        template: path.join(__dirname, 'agenda', 'index.ejs')
       }),
       ifProduction(new OfflinePlugin())
     ])

@@ -1,5 +1,5 @@
 import { CalendarEvent } from 'angular-calendar';
-import { colors } from '../demo-utils/colors';
+import { colors } from '../agenda-utils/colors';
 import { EventColor } from 'calendar-utils';
 
 export interface BulletinService extends CalendarEvent {

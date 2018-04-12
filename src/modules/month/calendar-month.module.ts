@@ -7,6 +7,7 @@ import { CalendarMonthCellComponent } from './calendar-month-cell.component';
 import { CalendarOpenDayEventsComponent } from './calendar-open-day-events.component';
 import { CalendarCommonModule } from '../common/calendar-common.module';
 import { CalendarMonthViewBodyComponent } from './calendar-month-view-body.component';
+import { ContextMenuModule } from 'ngx-contextmenu';
 
 export {
   CalendarMonthViewComponent,
@@ -16,7 +17,7 @@ export {
 export { MonthViewDay as CalendarMonthViewDay } from 'calendar-utils';
 
 @NgModule({
-  imports: [CommonModule, DragAndDropModule, CalendarCommonModule],
+  imports: [CommonModule, DragAndDropModule, CalendarCommonModule, ContextMenuModule],
   declarations: [
     CalendarMonthViewComponent,
     CalendarMonthCellComponent,

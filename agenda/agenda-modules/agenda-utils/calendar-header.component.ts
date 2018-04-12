@@ -1,10 +1,12 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
-  selector: 'mwl-demo-utils-calendar-header',
+  selector: 'mwl-agenda-utils-calendar-header',
   template: `
     <div class="row text-center">
-      <div class="col-md-4">
+      <div class="col-md-2">
+      </div>
+      <div class="col-md-2">
         <div class="btn-group">
           <div
             class="btn btn-primary"

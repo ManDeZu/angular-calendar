@@ -16,6 +16,6 @@
   "include": [
     "src",
     "test",
-    "demos"
+    "agenda"
   ]
 }

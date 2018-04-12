@@ -9,14 +9,14 @@ import {
   DAYS_OF_WEEK,
   CalendarEventTitleFormatter
 } from 'angular-calendar';
-import { colors } from '../demo-utils/colors';
+import { colors } from '../agenda-utils/colors';
 import { CustomDateFormatter } from './custom-date-formatter.provider';
 import { CustomEventTitleFormatter } from './custom-event-title-formatter.provider';
 import localeFr from '@angular/common/locales/fr';
 import { Equipe, BulletinService } from './custom-calendar-events';
 
 @Component({
-  selector: 'mwl-demo-component',
+  selector: 'mwl-agenda-component',
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'template.html',
   providers: [
@@ -30,7 +30,7 @@ import { Equipe, BulletinService } from './custom-calendar-events';
     }
   ]
 })
-export class DemoComponent {
+export class AgendaComponent {
   view: string = 'day';
   locale: string = 'fr';
   weekStartsOn: number = DAYS_OF_WEEK.MONDAY;
