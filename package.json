@@ -71,7 +71,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mattlewis92/angular-calendar.git"
+    "url": "git+https://github.com/ManDeZu/angular-calendar.git"
   },
   "keywords": [
     "angular",
@@ -82,9 +82,9 @@
   "author": "Matt Lewis",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mattlewis92/angular-calendar/issues"
+    "url": "https://github.com/ManDeZu/angular-calendar/issues"
   },
-  "homepage": "https://github.com/mattlewis92/angular-calendar#readme",
+  "homepage": "https://github.com/ManDeZu/angular-calendar#readme",
   "devDependencies": {
     "@angular/animations": "^5.2.4",
     "@angular/cdk": "^5.2.4",

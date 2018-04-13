@@ -3,7 +3,7 @@
     <div class="card-body text-center">
       <i class="fa fa-spin fa-spinner fa-5x"></i>
       <br>
-      Loading demo...
+      Chargement de l'agenda...
     </div>
   </div>
 </ng-template>
@@ -11,11 +11,11 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col-md-12">
-      <div class="card" *ngIf="firstDemoLoaded; else loading">
+      <div class="card" *ngIf="firstAgendaLoaded; else loading">
         <div class="card-header">
           <div class="row">
             <div class="col-md-6">
-              <h3>{{ activeDemo.label }}</h3>
+              <h3>{{ activeAgenda.label }}</h3>
             </div>
           </div>
         </div>

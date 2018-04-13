@@ -12,7 +12,7 @@
   "angularCompilerOptions": {
     "strictMetadataEmit": true,
     "skipMetadataEmit" : true,
-    "entryModule": "demos/demo-app.module#DemoAppModule",
+    "entryModule": "agenda/agenda-app.module#AgendaAppModule",
     "trace": true,
     "strictInjectionParameters": true,
     "preserveWhitespaces": true,
